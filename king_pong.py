@@ -74,11 +74,11 @@ class GameState:
                 self.cpux, self.cpuy = PADDLE_X_DISTANCE, PADDLE_Y_DISTANCE
                 self.ballx, self.bally = SCREEN_WIDTH/2, SCREEN_HEIGHT/2
                 self.ball_speed_x = random.choice(
-                        range(-self.top_speed+1, -int(2*self.top_speed/3)) +
-                        range(int(2*self.top_speed/3), self.top_speed))
+                        list(range(-self.top_speed+1, -int(2*self.top_speed/3))) +
+                        list(range(int(2*self.top_speed/3), self.top_speed)))
                 self.ball_speed_y = random.choice(
-                        range(-self.top_speed+1, -int(2*self.top_speed/3)) +
-                        range(int(2*self.top_speed/3), self.top_speed))
+                        list(range(-self.top_speed+1, -int(2*self.top_speed/3))) +
+                        list(range(int(2*self.top_speed/3), self.top_speed)))
 
         def frame_step(self, input_actions):
                 """

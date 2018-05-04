@@ -92,7 +92,7 @@ class MultilayerConvolutionalNetwork:
         W_fc2, b_fc2 = self.build_weights_biases([512, self.nchannels])
         readout = tf.matmul(h_fc1, W_fc2) + b_fc2
 
-        readout_action = tf.reduce_sum(tf.mul(readout, self.a), reduction_indices=1)
+        readout_action = tf.reduce_sum(tf.multiply(readout, self.a), reduction_indices=1)
         cost_function = tf.reduce_mean(tf.square(self.y - readout_action))
         train_step = tf.train.AdamOptimizer(1e-8).minimize(cost_function)
 
