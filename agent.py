@@ -29,8 +29,7 @@ class DeepLearningAgent:
         self.environment.print_scores = not train
         self.step = 0
         self.perception = percept.MultilayerConvolutionalNetwork(
-            input_width, input_height, nimages, nactions)
-
+                            input_width, input_height, nimages, nactions)
         self.logs_directory = 'logs'
         self.percepts_directory = 'percepts'
         self.networks_directory = 'networks'
@@ -143,7 +142,7 @@ class DeepLearningAgent:
         observe period hasn't been completed.
 
         It basically grabs a self.batch_size sample from the
-        memory bank, extrans the sars observations and it
+        memory bank, extracts the sars observations and it
         batch trains the deep neural network
         """
 
@@ -203,6 +202,7 @@ class DeepLearningAgent:
         """
         Main agent loop that selects and action, acts, remembers
         what happen, learns, updates, saves the progress and
+        +
         decides if it should die
         """
         log.debug('entering main agent loop')
@@ -283,7 +283,7 @@ def main(args):
     log.info('Verbose output enabled ' + str(log.getLogger().getEffectiveLevel()))
     log.debug(args)
 
-    npixels, nactions, nimages = 80, 3, 4
+    npixels, nactions, nimages = 80, 9, 4   ## nactions
     agent = DeepLearningAgent(npixels, npixels, nactions, nimages, args.reset, args.train)
     log.info('agent loaded successfully')
 
@@ -294,17 +294,17 @@ def main(args):
 
     noop = np.zeros(nactions)
     noop[0] = 1 # 0 action is do nothing, 1 is up, 2 is down
-    raw_percept, _ = agent.environment.frame_step(noop)
+    raw_percept, _ = agent.environment.frame_step(noop)             ##
     log.info('pumping first frame on the game state')
 
-    x_t = agent.perception.preprocess_percepts(raw_percept, False)
+    x_t = agent.perception.preprocess_percepts(raw_percept, False)  ##
     first_percept_stack = np.stack((x_t, x_t, x_t, x_t), axis = 2)
     log.info('first stack created successfully')
 
     agent.load_progress()
     log.info('agent load progress completed')
 
-    agent.exist(first_percept_stack)
+    agent.exist(first_percept_stack)                                ##
     log.info('agent dies')
 
 
@@ -362,12 +362,14 @@ if __name__ == '__main__':
         '-t', '--train',
         help='allows the training of the deep neural network. '
              'NOTE: leave disabled to only see the current agent behave',
-        dest='train', action='store_true')
+        dest='train', action='store_true'
+    )
     parser.add_argument(
         '-c', '--clear',
         help='clears the folders where the state of the agent is saves. '
              'NOTE: use this to retrain the agent from scratch',
-        dest='reset', action='store_true')
+        dest='reset', action='store_true'
+    )
 
     args = parser.parse_args()
     if args.loglevel:
@@ -376,5 +378,4 @@ if __name__ == '__main__':
     else:
         log.basicConfig(format='%(asctime)s - %(levelname)s: %(message)s',
                         datefmt='%m/%d/%Y %I:%M:%S %p', level=log.CRITICAL)
-
     main(args)
