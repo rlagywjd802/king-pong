@@ -1,6 +1,7 @@
 import tensorflow as tf
 import cv2
 import numpy as np
+import pickle
 
 class MultilayerConvolutionalNetwork:
     """
@@ -16,9 +17,10 @@ class MultilayerConvolutionalNetwork:
         self.nchannels = nchannels
         self.a = tf.placeholder("float", [None, self.nchannels])
         self.y = tf.placeholder("float", [None])
-        self.input_image, self.y_conv, self.h_fc1, self.train_step = self.build_network()
+        self.input_image, self.y_conv, self.h_fc1, self.cost_function, self.train_step = self.build_network()
         self.session.run(tf.initialize_all_variables())
         self.saver = tf.train.Saver()
+        self.f = open("cost/data.pkl", 'wb')
 
     def weight_variable(self, shape, stddev = 0.01):
         """
@@ -92,16 +94,23 @@ class MultilayerConvolutionalNetwork:
         W_fc2, b_fc2 = self.build_weights_biases([512, self.nchannels])
         readout = tf.matmul(h_fc1, W_fc2) + b_fc2
 
-        readout_action = tf.reduce_sum(tf.mul(readout, self.a), reduction_indices=1)
+        readout_action = tf.reduce_sum(tf.multiply(readout, self.a), reduction_indices=1)
         cost_function = tf.reduce_mean(tf.square(self.y - readout_action))
         train_step = tf.train.AdamOptimizer(1e-8).minimize(cost_function)
 
-        return input_image, readout, h_fc1, train_step
+        return input_image, readout, h_fc1, cost_function, train_step
 
     def train(self, value_batch, action_batch, state_batch):
         """
         Does the actual training step
         """
+        cost_function = self.cost_function.eval(feed_dict = {self.y : value_batch,
+            self.a : action_batch,
+            self.input_image : state_batch})
+        # print(cost_function)
+
+        pickle.dump(cost_function, self.f)
+
         self.train_step.run(feed_dict = {
             self.y : value_batch,
             self.a : action_batch,
